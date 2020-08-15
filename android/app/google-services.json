@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1062749900539",
+    "firebase_url": "https://alpha-chat-2020.firebaseio.com",
+    "project_id": "alpha-chat-2020",
+    "storage_bucket": "alpha-chat-2020.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1062749900539:android:53fec315d183b3ff082a5e",
+        "android_client_info": {
+          "package_name": "com.alpha.alphachat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1062749900539-72ek37j99r7ote1n1qfhi6pmhb24bhoq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alpha.alphachat",
+            "certificate_hash": "b6a39e135ad45cf0eea1a2c665fd69a43dfde5ab"
+          }
+        },
+        {
+          "client_id": "1062749900539-hc4tbhnkqj1tl5ce093bho7fjf7suoge.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7AAQW82x5TI4CtXZ8rJGg2W1SUt3jEyc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1062749900539-hc4tbhnkqj1tl5ce093bho7fjf7suoge.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
