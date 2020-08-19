@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:alphachat/helpers/db_helper.dart';
+import 'package:alphachat/screens/chat_screen.dart';
 import 'package:alphachat/widgets/Profile.dart';
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,12 @@ import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
 
 class InputAndNotificationProvider with ChangeNotifier {
+  bool state = false;
+  void changeState(bool boolState){
+    state = boolState;
+    
+    notifyListeners();
+  }
   void onSendMessage(
     String content,
     String id,
@@ -33,7 +40,7 @@ class InputAndNotificationProvider with ChangeNotifier {
     if (content.trim() != '') {
       HapticFeedback.vibrate();
       // textEditingController.clear();
-      DBHelper.insert('messages', {
+      DBHelper.insert(groupChatId.replaceAll('-', '_'), {
         'id': stamp,
         'idFrom': id,
         'idTo': docId,
@@ -41,6 +48,10 @@ class InputAndNotificationProvider with ChangeNotifier {
         'content': content,
         'read': '1'
       });
+      // Chat.of(context).setState(() {
+        
+      // });
+      notifyListeners();
 
       var documentReference = Firestore.instance
           .collection('messages')

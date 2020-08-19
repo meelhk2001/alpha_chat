@@ -1,3 +1,4 @@
+import 'package:alphachat/helpers/message_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,7 +20,7 @@ class MyMessage extends StatelessWidget {
 
   final bool hyperlink;
   final String groupChatId;
-  final DocumentSnapshot document;
+  final Message document;
   final dynamic scaffoldKey;
   final dynamic listMessage;
   final String id;
@@ -28,7 +29,7 @@ class MyMessage extends StatelessWidget {
   bool isLastMessageRight(int index) {
     if ((index > 0 &&
             listMessage != null &&
-            listMessage[index - 1]['idFrom'] != id) ||
+            listMessage[index - 1].idFrom != id) ||
         index == 0) {
       return true;
     } else {
@@ -45,7 +46,7 @@ class MyMessage extends StatelessWidget {
               bottom: isLastMessageRight(index) ? 20.0 : 3.0, right: 0.0),
           padding: EdgeInsets.fromLTRB(8.0, 5.0, 8.0, 5.0),
           decoration: BoxDecoration(
-              color: document['read'] == 1 ? Colors.cyan[800] : Colors.teal,
+              color: document.read == '1' ? Colors.cyan[800] : Colors.teal,
               borderRadius: BorderRadius.circular(8.0)),
           // /;;;;';;
           child: ConstrainedBox(
@@ -62,7 +63,7 @@ class MyMessage extends StatelessWidget {
                   children: <Widget>[
                     InkWell(
                       child: Text(
-                        document['content'],
+                        document.content,
                         style: TextStyle(
                             color: hyperlink ? Colors.blue[900] : Colors.white,
                             fontSize: 18,
@@ -72,7 +73,7 @@ class MyMessage extends StatelessWidget {
                       ),
                       onTap: hyperlink
                           ? () async {
-                              String text = document['content'].toString();
+                              String text = document.content.toString();
 
                               //document['content'].toString().toLowerCase();
                               text = text.replaceAll('https://', '');
@@ -97,7 +98,7 @@ class MyMessage extends StatelessWidget {
                     Text(
                       DateFormat('ddMMMyy h:mm a').format(
                           DateTime.fromMillisecondsSinceEpoch(
-                              int.parse(document['timestamp']))),
+                              int.parse(document.timestamp))),
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 12.0,
@@ -107,7 +108,7 @@ class MyMessage extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                     color:
-                        document['read'] == 1 ? Colors.cyan[800] : Colors.teal,
+                        document.read == '1' ? Colors.cyan[800] : Colors.teal,
                     borderRadius: BorderRadius.circular(8.0)),
               ),
               onLongPress: () {
@@ -120,22 +121,22 @@ class MyMessage extends StatelessWidget {
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 Clipboard.setData(ClipboardData(
-                                  text: document['content'],
+                                  text: document.content,
                                 ));
 
                                 Fluttertoast.showToast(msg: 'Message Copied');
                               }),
-                          IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                await Firestore.instance
-                                    .collection('messages')
-                                    .document(groupChatId)
-                                    .collection(groupChatId)
-                                    .document(document.documentID)
-                                    .delete();
-                              }),
+                          // IconButton(
+                          //     icon: Icon(Icons.delete),
+                          //     onPressed: () async {
+                          //       Navigator.of(context).pop();
+                          //       await Firestore.instance
+                          //           .collection('messages')
+                          //           .document(groupChatId)
+                          //           .collection(groupChatId)
+                          //           .document(document.documentID)
+                          //           .delete();
+                          //     }),
                           IconButton(
                               icon: Icon(Icons.cancel),
                               onPressed: () {

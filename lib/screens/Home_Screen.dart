@@ -1,5 +1,5 @@
 import 'edit_yourself.dart';
-import 'login_screen.dart';
+import '../helpers/db_helper.dart';
 import 'add_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../providers/homeprovider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/Profile.dart';
+import 'package:sqflite/sqflite.dart' as sql;
 
 class Home extends StatelessWidget {
   final FirebaseUser user;
@@ -16,6 +17,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //DBHelper.delete('messages');
     return WillPopScope(
       onWillPop: () {
         Provider.of<HomeProvider>(context, listen: false).onExitPress(context);

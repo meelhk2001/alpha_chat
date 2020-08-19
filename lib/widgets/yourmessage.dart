@@ -1,3 +1,4 @@
+import 'package:alphachat/helpers/message_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,7 @@ class YourMessage extends StatelessWidget {
   }) ;
 
   final bool hyperlink;
-  final document;
+  final Message document;
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +40,7 @@ class YourMessage extends StatelessWidget {
                         children: <Widget>[
                           InkWell(
                             child: Text(
-                              document[
-                                  'content'], ///////////////////////////////////////////////////////////////////////////
+                              document.content, ///////////////////////////////////////////////////////////////////////////
                               style: TextStyle(
                                   color: hyperlink
                                       ? Colors.blue[900]
@@ -57,7 +57,7 @@ class YourMessage extends StatelessWidget {
                           Text(
                             DateFormat('ddMMMyy h:mm a').format(
                                 DateTime.fromMillisecondsSinceEpoch(
-                                    int.parse(document['timestamp']))),
+                                    int.parse(document.timestamp))),
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 10.0,
@@ -74,13 +74,13 @@ class YourMessage extends StatelessWidget {
                 ),
                 onLongPress: () {
                   Clipboard.setData(ClipboardData(
-                    text: document['content'],
+                    text: document.content,
                   ));
                   Fluttertoast.showToast(msg: 'Message Copied');
                 },
                 onTap: hyperlink
                     ? () async {
-                        String text = document['content'].toString();
+                        String text = document.content.toString();
                         //document['content'].toString().toLowerCase();
                         text = text.replaceAll('https://', '');
                         text = text.replaceAll('http://', "");

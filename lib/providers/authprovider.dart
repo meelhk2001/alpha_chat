@@ -5,10 +5,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../screens/Home_Screen.dart';
+import 'package:sqflite/sqflite.dart' as sql;
 
 class AuthProvider with ChangeNotifier {
   var loading = false;
   String otp;
+  String dbPath;
   var isLoading = false;
   AuthCredential credential;
   String phoneNumber;
@@ -23,6 +25,7 @@ class AuthProvider with ChangeNotifier {
   //get current user function starts from here ................................
   Future<void> getCurrentUser(BuildContext context) async {
     try {
+       dbPath = await sql.getDatabasesPath();
       isLoading = true;
       notifyListeners();
       user = await FirebaseAuth.instance.currentUser();

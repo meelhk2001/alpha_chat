@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:alphachat/helpers/db_helper.dart';
+import 'package:alphachat/providers/input_and_notificationprovider.dart';
 import 'package:alphachat/widgets/Profile.dart';
 
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ import '../widgets/input.dart';
 import 'user_details.dart';
 
 class Chat extends StatefulWidget {
+  //static _ChatState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<_ChatState>());
   final String docId;
   final String imageUrl;
   final String name;
@@ -84,6 +87,11 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
 
   @override
   void didChangeDependencies() {
+    // if (Provider.of<InputAndNotificationProvider>(context).state) {
+    //   setState(() {});
+    //   Provider.of<InputAndNotificationProvider>(context, listen: false)
+    //       .changeState(false);
+    // }
     if (isInit) {
       groupChatId = '';
       Provider.of<ChatProvider>(context, listen: false).readLocal(widget.docId);
@@ -124,6 +132,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+   // DBHelper.delete('all');
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: Color.fromRGBO(236, 229, 221, 1),
@@ -140,31 +149,38 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
               child: Text(widget.name ?? 'Chat'),
               onTap: () {
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UserDetails(userId:widget.docId, userName: widget.name,),
-                  ));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserDetails(
+                        userId: widget.docId,
+                        userName: widget.name,
+                      ),
+                    ));
               },
             ),
           ],
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: <Widget>[
-          // List of messages
-          Provider.of<ChatProvider>(context, listen: false)
-              .buildListMessage(groupChatId, listMessage, scaffoldKey),
-          // Input content
-          Input(
-        textEditingController: textEditingController,
-        typedMessage: typedMessage,
-        id: widget.id,
-        docId: widget.docId,
-        phoneNumber: phoneNumber,
-        groupChatId: groupChatId),
-        ],
-      ),
+      body:
+       Provider.of<InputAndNotificationProvider>(context).state
+          ? Center(child: CircularProgressIndicator())
+          :
+           Column(
+              children: <Widget>[
+                // List of messages
+                Provider.of<ChatProvider>(context, listen: false)
+                    .buildListMessage(groupChatId, listMessage, scaffoldKey, context),
+                // Input content
+                Input(
+                    textEditingController: textEditingController,
+                    typedMessage: typedMessage,
+                    id: widget.id,
+                    docId: widget.docId,
+                    phoneNumber: phoneNumber,
+                    groupChatId: groupChatId),
+              ],
+            ),
     );
   }
 
@@ -172,6 +188,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
   ///Strating of notification code
 
   Future<void> sendNotification(String title) async {
+    
     String body;
     var prefs = Provider.of<ChatProvider>(context, listen: false).prefs;
     var _phone = await prefs.getString('phoneNumber');
