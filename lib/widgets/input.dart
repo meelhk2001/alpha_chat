@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/input_and_notificationprovider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Input extends StatelessWidget {
   Input(
@@ -11,10 +12,12 @@ class Input extends StatelessWidget {
       @required this.id,
       @required this.docId,
       @required this.phoneNumber,
-      @required this.groupChatId});
+      @required this.groupChatId,
+      @required this.nickname,
+      });
 
   final TextEditingController textEditingController;
-  String typedMessage, content, id, docId, phoneNumber, groupChatId;
+  String typedMessage, content, id, docId, phoneNumber, groupChatId, nickname;
 
   @override
   Widget build(BuildContext context) {
@@ -76,15 +79,46 @@ class Input extends StatelessWidget {
                     size: 40,
                   ),
                   onPressed: () {
-                    Provider.of<InputAndNotificationProvider>(context,listen: false)
+                    String stamp = DateTime.now().millisecondsSinceEpoch.toString();
+                    try{
+                      DocumentReference documentReference = Firestore.instance
+                        .collection('messages')
+                        .document(groupChatId)
+                        .collection(groupChatId)
+                        .document(
+                            stamp);
+
+                    Firestore.instance.runTransaction((transaction) async {
+                      if(textEditingController.text.trim()!=''){
+                      await transaction.set(
+                        documentReference,
+                        {
+                          'idFrom': id,
+                          'idTo': docId,
+                          'timestamp':
+                              stamp,
+                          'content': textEditingController.text,
+                          'read': 1
+                        },
+                      ).whenComplete(() => textEditingController.clear());}
+                    });
+                    }catch(error){print(error.toString());
+                    textEditingController.clear();}
+                    print(
+                        'button dabaya HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
+                    print(DateTime.now().toIso8601String().toString());
+                    Provider.of<InputAndNotificationProvider>(context,
+                            listen: false)
                         .onSendMessage(
                       textEditingController.text,
                       id,
                       docId,
                       context,
                       groupChatId,
+                      stamp,
+                      nickname
                     );
-                    textEditingController.clear();
+                    
                   },
                   color: Colors.teal,
                 ),

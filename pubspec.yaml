@@ -44,6 +44,7 @@ dependencies:
   path: ^1.7.0
   flutter_parsed_text: ^1.2.4
   sqlbrite: ^1.4.0
+  contacts_service: ^0.4.6
 
 dev_dependencies:
   flutter_test:

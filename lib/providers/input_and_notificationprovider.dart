@@ -31,8 +31,11 @@ class InputAndNotificationProvider with ChangeNotifier {
     String docId,
     BuildContext context,
     String groupChatId,
+    String stamp,
+    String nickname
   ) {
-    var stamp = DateTime.now().millisecondsSinceEpoch.toString();
+    
+    
     var phoneNumber =
         Provider.of<ChatProvider>(context, listen: false).phoneNumber;
     HapticFeedback.lightImpact();
@@ -52,39 +55,32 @@ class InputAndNotificationProvider with ChangeNotifier {
         
       // });
       notifyListeners();
+      print('local v v v local v local local local local local local local locallocalyyyyyyyyyyyyyyYYYYYYYY');
+      print(DateTime.now().toIso8601String().toString());
+      // DocumentReference documentReference = Firestore.instance
+      //     .collection('messages')
+      //     .document(groupChatId)
+      //     .collection(groupChatId)
+      //     .document(stamp);
 
-      var documentReference = Firestore.instance
-          .collection('messages')
-          .document(groupChatId)
-          .collection(groupChatId)
-          .document(stamp);
-/////////////////////////////////////////////////////////////////////////////
       Firestore.instance.runTransaction((transaction) async {
-        await transaction.set(
-          documentReference,
-          {
-            'idFrom': id,
-            'idTo': docId,
-            'timestamp': stamp,
-            'content': content,
-            'read': 1
-          },
-        );
+        
+        
         try {
-          QuerySnapshot result = await Firestore.instance
+          var result = await Firestore.instance
               .collection('users')
-              .document(id)
-              .collection('contacts')
-              .where('id', isEqualTo: docId)
-              .getDocuments();
-          String contactNumber = result.documents[0].documentID;
+              .where('id',isEqualTo: docId).getDocuments();
+              
+          String contactNumber = result.documents[0]['nickname'];
           await Firestore.instance
               .collection('users')
               .document(id)
               .collection('contacts')
               .document(contactNumber)
               .setData(
-                  {'order': DateTime.now().millisecondsSinceEpoch.toString()},
+                  { 'nickname':nickname,
+                    'id': result.documents[0].documentID,
+                    'order': DateTime.now().millisecondsSinceEpoch.toString()},
                   merge: true);
           await Firestore.instance
               .collection('users')
@@ -117,6 +113,7 @@ class InputAndNotificationProvider with ChangeNotifier {
             'order': DateTime.now().millisecondsSinceEpoch.toString(),
           }, merge: true);
           // sendNotification('New Message');
+          
         }
       });
 

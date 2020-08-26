@@ -230,7 +230,7 @@ class _EditYourselfState extends State<EditYourself> {
                       ),
                       onPressed: () {
                         _auth.signOut();
-                        DBHelper.delete('all');
+                        //DBHelper.delete('all');
                         Navigator.of(context).pop();
                         Navigator.pushReplacement(
                             context,

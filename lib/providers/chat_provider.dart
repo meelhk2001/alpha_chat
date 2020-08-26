@@ -84,8 +84,7 @@ class ChatProvider with ChangeNotifier {
                         'timestamp': listMessage['timestamp'],
                         'content': listMessage['content'],
                         'read': '0'
-                      });
-                      Firestore.instance
+                      }).then((_) => Firestore.instance
                           .collection('messages')
                           .document(groupChatId)
                           .collection(groupChatId)
@@ -94,34 +93,34 @@ class ChatProvider with ChangeNotifier {
                           .where('idTo', isEqualTo: id)
                           .getDocuments()
                           .then((value) => value.documents[0].reference
-                              .updateData({'read': 0}));
+                              .updateData({'read': 0})));
+                      
                     } else {
                       if (int.parse(messageSnapshot.data.documents[si]['read']
                               .toString()) ==
                           0) {
                         DocumentSnapshot listMessage =
                             messageSnapshot.data.documents[si];
-                        // try {
-                        //   DBHelper.update(groupChatId.replaceAll('-', '_'), {
-                        //     'id': listMessage['timestamp'],
-                        //     'idFrom': listMessage['idFrom'],
-                        //     'idTo': listMessage['idTo'],
-                        //     'timestamp': listMessage['timestamp'],
-                        //     'content': listMessage['content'],
-                        //     'read': '0'
-                        //   }).then((value) => Firestore.instance
-                        //       .collection('messages')
-                        //       .document(groupChatId)
-                        //       .collection(groupChatId)
-                        //       .where('timestamp',
-                        //           isEqualTo: listMessage['timestamp'])
-                        //       .where('idTo', isEqualTo: id)
-                        //       .getDocuments()
-                        //       .then((value) =>
-                        //           value.documents[0].reference.delete()));
-                        // } catch (error) {
-                        //   throw error;
-                        // }
+                        try {
+                          DBHelper.update(groupChatId.replaceAll('-', '_'), {
+                            'id': listMessage['timestamp'],
+                            'idFrom': listMessage['idFrom'],
+                            'idTo': listMessage['idTo'],
+                            'timestamp': listMessage['timestamp'],
+                            'content': listMessage['content'],
+                            'read': '0'
+                          }).then((_) => Firestore.instance
+                              .collection('messages')
+                              .document(groupChatId)
+                              .collection(groupChatId)
+                              .where('timestamp',
+                                  isEqualTo: listMessage['timestamp'])
+                              .getDocuments()
+                              .then((value) =>
+                                  value.documents[0].reference.delete()));
+                        } catch (error) {
+                          print(error.toString());
+                        }
                       }
                     }
                   }
@@ -129,16 +128,6 @@ class ChatProvider with ChangeNotifier {
                 return StreamBuilder<List<Message>>(
                   stream:
                       DBHelper.getAllItems(groupChatId.replaceAll('-', '_')),
-                  // future.data
-                  //     .query(groupChatId.replaceAll('-', '_'))
-                  //     .asStream(),
-                  //  Firestore.instance
-                  //     .collection('messages')
-                  //     .document(groupChatId)
-                  //     .collection(groupChatId)
-                  //     .orderBy('timestamp', descending: true)
-                  //     .limit(101)
-                  //     .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return Center(
@@ -148,18 +137,18 @@ class ChatProvider with ChangeNotifier {
                                 AlwaysStoppedAnimation<Color>(Colors.teal)),
                       ));
                     } else {
-                      print(
-                          'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ');
-                      print(snapshot.data.toString());
-                      listMessage = snapshot.data;
+                      snapshot.data.sort((a,b)=>int.parse(a.timestamp).compareTo(int.parse(b.timestamp)));
+                      // print(
+                      //     'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ');
+                      // print(snapshot.data.toString());
+                      //listMessage = snapshot.data;
                       return ListView.builder(
                         padding: EdgeInsets.all(10.0),
                         itemBuilder: (context, index) => buildChat(
                             index,
                             snapshot.data[snapshot.data.length - index - 1],
-                            index,
-                            listMessage,
-                            scaffoldKey),
+                            snapshot.data,
+                            scaffoldKey,context),
                         itemCount: snapshot.data.length,
                         reverse: true,
                         //controller: listScrollController,
@@ -172,28 +161,65 @@ class ChatProvider with ChangeNotifier {
   }
 
   Widget buildChat(
-      int index, Message document, int i, listMessage, scaffoldKey) {
+      int index, Message document, List<Message>listMessage, scaffoldKey, BuildContext context) {
     bool hyperlink = false;
-    // if (!document['content'].toString().contains(" ")) {
-    //   links.forEach((element) {
-    //     if (document['content'].toString().contains(element.toString())) {
-    //       hyperlink = true;
-    //     }
-    //   });
-    // }
+    if (!document.content.contains(" ")) {
+      links.forEach((element) {
+        if (document.content.contains(element.toString())) {
+          hyperlink = true;
+        }
+      });
+    }
 
     if (document.idFrom == id) {
       // Right (my message)
       return MyMessage(
-        hyperlink: hyperlink,
-        groupChatId: groupChatId,
-        document: document,
-        id: id,
-        index: index,
-        listMessage: listMessage,
-        scaffoldKey: scaffoldKey,
-        //key: scaffoldKey,
-      );
+                read: !(document.read=='1'),
+                hyperlink: hyperlink,
+                groupChatId: groupChatId,
+                document: document,
+                id: id,
+                index: listMessage.length-index-1,
+                listMessage: listMessage,
+                scaffoldKey: scaffoldKey,
+                cntx: context
+                //key: scaffoldKey,
+              );
+      // return StreamBuilder<dynamic>(
+      //     stream: Firestore.instance
+      //         .collection('messages')
+      //         .document(groupChatId)
+      //         .collection(groupChatId)
+      //         .where('timestamp', isEqualTo: document.timestamp)
+      //         .snapshots(),
+      //     builder: (context, readSnapshot) {
+      //       if (readSnapshot.hasData && readSnapshot.data.documents.length !=0) {
+      //         print(readSnapshot.data.documents[0]['read'].toString());
+      //         return MyMessage(
+      //           read: int.parse(readSnapshot.data.documents[0]['read'].toString()) == 0,
+      //           hyperlink: hyperlink,
+      //           groupChatId: groupChatId,
+      //           document: document,
+      //           id: id,
+      //           index: index,
+      //           listMessage: listMessage,
+      //           scaffoldKey: scaffoldKey,
+      //           //key: scaffoldKey,
+      //         );
+      //       } else {
+      //         return MyMessage(
+      //           read: !(document.read=='1'),
+      //           hyperlink: hyperlink,
+      //           groupChatId: groupChatId,
+      //           document: document,
+      //           id: id,
+      //           index: index,
+      //           listMessage: listMessage,
+      //           scaffoldKey: scaffoldKey,
+      //           //key: scaffoldKey,
+      //         );
+      //       }
+      //     });
     } else {
       // Firestore.instance
       //     .collection('messages')
@@ -205,6 +231,7 @@ class ChatProvider with ChangeNotifier {
       return YourMessage(
         hyperlink: hyperlink,
         document: document,
+        groupChatId: groupChatId,
       );
     }
   }

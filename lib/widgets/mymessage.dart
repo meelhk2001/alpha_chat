@@ -1,22 +1,24 @@
 import 'package:alphachat/helpers/message_modal.dart';
+import 'package:alphachat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../helpers/db_helper.dart';
 
 class MyMessage extends StatelessWidget {
-  const MyMessage(
-      {
+  MyMessage(
+      {@required this.read,
       @required this.hyperlink,
       @required this.groupChatId,
       @required this.document,
       @required this.scaffoldKey,
       @required this.listMessage,
       @required this.id,
-      @required this.index})
-      ;
+      @required this.index,
+      @required this.cntx});
 
   final bool hyperlink;
   final String groupChatId;
@@ -25,6 +27,8 @@ class MyMessage extends StatelessWidget {
   final dynamic listMessage;
   final String id;
   final int index;
+  final bool read;
+  final BuildContext cntx;
 
   bool isLastMessageRight(int index) {
     if ((index > 0 &&
@@ -39,6 +43,22 @@ class MyMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // if (read && document.read == '1') {
+    //   DBHelper.update(groupChatId.replaceAll('-', '_'), {
+    //     'id': document.timestamp,
+    //     'idFrom': document.idFrom,
+    //     'idTo': document.idTo,
+    //     'timestamp': document.timestamp,
+    //     'content': document.content,
+    //     'read': '0'
+    //   }).then((value) => Firestore.instance
+    //       .collection('messages')
+    //       .document(groupChatId)
+    //       .collection(groupChatId)
+    //       .where('timestamp', isEqualTo: document.timestamp).where('read', isEqualTo: 0)
+    //       .getDocuments()
+    //       .then((value) => value.documents[0].reference.delete()));
+    // }
     return Row(
       children: <Widget>[
         Container(
@@ -46,7 +66,7 @@ class MyMessage extends StatelessWidget {
               bottom: isLastMessageRight(index) ? 20.0 : 3.0, right: 0.0),
           padding: EdgeInsets.fromLTRB(8.0, 5.0, 8.0, 5.0),
           decoration: BoxDecoration(
-              color: document.read == '1' ? Colors.cyan[800] : Colors.teal,
+              color: read ? Colors.teal : Colors.cyan[800],
               borderRadius: BorderRadius.circular(8.0)),
           // /;;;;';;
           child: ConstrainedBox(
@@ -107,8 +127,8 @@ class MyMessage extends StatelessWidget {
                   ],
                 ),
                 decoration: BoxDecoration(
-                    color:
-                        document.read == '1' ? Colors.cyan[800] : Colors.teal,
+                    // color:
+                    //     document.read == '1' ? Colors.cyan[800] : Colors.teal,
                     borderRadius: BorderRadius.circular(8.0)),
               ),
               onLongPress: () {
@@ -124,19 +144,29 @@ class MyMessage extends StatelessWidget {
                                   text: document.content,
                                 ));
 
-                                Fluttertoast.showToast(msg: 'Message Copied');
+                                Fluttertoast.showToast(
+                                    msg: 'Message Copied',
+                                    backgroundColor: Colors.teal);
                               }),
-                          // IconButton(
-                          //     icon: Icon(Icons.delete),
-                          //     onPressed: () async {
-                          //       Navigator.of(context).pop();
-                          //       await Firestore.instance
-                          //           .collection('messages')
-                          //           .document(groupChatId)
-                          //           .collection(groupChatId)
-                          //           .document(document.documentID)
-                          //           .delete();
-                          //     }),
+                          IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                try {
+                                  await Firestore.instance
+                                      .collection('messages')
+                                      .document(groupChatId)
+                                      .collection(groupChatId)
+                                      .document(document.timestamp)
+                                      .delete();
+                                } catch (error) {
+                                  print(error);
+                                }
+                                DBHelper.delete(
+                                        groupChatId.replaceAll('-', '_'),
+                                        document.id,cntx)
+                                    ;
+                              }),
                           IconButton(
                               icon: Icon(Icons.cancel),
                               onPressed: () {

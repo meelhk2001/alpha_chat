@@ -1,17 +1,17 @@
 import 'package:alphachat/helpers/message_modal.dart';
+import 'package:alphachat/screens/chat_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart' as path;
 import 'package:sqlbrite/sqlbrite.dart' ;
+import '../screens/chat_screen.dart';
 
 class DBHelper {
-  static Future<void> delete(String messages) async {
-    final dbPath = await sql.getDatabasesPath();
-    if (messages == 'all') {
-      sql.deleteDatabase(path.join(dbPath));
-    
-    } else {
-      sql.deleteDatabase(path.join(dbPath, '$messages.db'));
-    }
+  static Future<void> delete(String table, String id, BuildContext context) async {
+    final db = await DBHelper.database(table);
+    await db.delete(table, where: 'id = $id');
+    Chat.of(context).setState(() {});
+    print(id);
   }
 
   static Future<sql.Database> database(String groupChatId) async {

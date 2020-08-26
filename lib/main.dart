@@ -1,3 +1,5 @@
+import 'package:alphachat/providers/contactprovider.dart';
+
 import 'providers/input_and_notificationprovider.dart';
 
 import 'providers/chat_provider.dart';
@@ -16,7 +18,8 @@ class MyApp extends StatelessWidget {
       providers: [ChangeNotifierProvider.value(value: AuthProvider()),
       ChangeNotifierProvider.value(value: HomeProvider()),
       ChangeNotifierProvider.value(value: ChatProvider()),
-      ChangeNotifierProvider.value(value: InputAndNotificationProvider())
+      ChangeNotifierProvider.value(value: InputAndNotificationProvider()),
+      ChangeNotifierProvider.value(value: ContactProvider())
       ],
       child: MaterialApp(
         title: 'Alphabics',

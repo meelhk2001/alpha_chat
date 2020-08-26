@@ -10,7 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/services.dart';
 import 'package:dio/dio.dart';
-
+import '../helpers/db_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../providers/chat_provider.dart';
@@ -18,7 +18,7 @@ import '../widgets/input.dart';
 import 'user_details.dart';
 
 class Chat extends StatefulWidget {
-  //static _ChatState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<_ChatState>());
+  static _ChatState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<_ChatState>());
   final String docId;
   final String imageUrl;
   final String name;
@@ -163,9 +163,9 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
         centerTitle: true,
       ),
       body:
-       Provider.of<InputAndNotificationProvider>(context).state
-          ? Center(child: CircularProgressIndicator())
-          :
+      //  Provider.of<InputAndNotificationProvider>(context).state
+      //     ? Center(child: CircularProgressIndicator())
+      //     :
            Column(
               children: <Widget>[
                 // List of messages
@@ -178,7 +178,8 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                     id: widget.id,
                     docId: widget.docId,
                     phoneNumber: phoneNumber,
-                    groupChatId: groupChatId),
+                    groupChatId: groupChatId,
+                    nickname: widget.name,),
               ],
             ),
     );

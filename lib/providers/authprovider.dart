@@ -1,3 +1,4 @@
+import 'package:alphachat/screens/tabs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,11 +7,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../screens/Home_Screen.dart';
 import 'package:sqflite/sqflite.dart' as sql;
+import 'package:provider/provider.dart';
+import 'contactprovider.dart';
 
 class AuthProvider with ChangeNotifier {
   var loading = false;
   String otp;
-  String dbPath;
+  //String dbPath;
   var isLoading = false;
   AuthCredential credential;
   String phoneNumber;
@@ -25,7 +28,8 @@ class AuthProvider with ChangeNotifier {
   //get current user function starts from here ................................
   Future<void> getCurrentUser(BuildContext context) async {
     try {
-       dbPath = await sql.getDatabasesPath();
+      // dbPath = await sql.getDatabasesPath();
+      Provider.of<ContactProvider>(context,listen: false).getContacts();
       isLoading = true;
       notifyListeners();
       user = await FirebaseAuth.instance.currentUser();
@@ -35,7 +39,7 @@ class AuthProvider with ChangeNotifier {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => Home(user,phoneNumber),
+              builder: (context) => TabsScreen(user,phoneNumber),
             ));
       } else {
         isLoading = false;

@@ -4,18 +4,32 @@ import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class YourMessage extends StatelessWidget {
-  const YourMessage({
-    @required this.hyperlink,
-    @required this.document
-  }) ;
+  const YourMessage(
+      {@required this.hyperlink,
+      @required this.document,
+      @required this.groupChatId});
 
   final bool hyperlink;
   final Message document;
+  final String groupChatId;
 
   @override
   Widget build(BuildContext context) {
+    // try {
+    //   Firestore.instance
+    //       .collection('messages')
+    //       .document(groupChatId)
+    //       .collection(groupChatId)
+    //       .where('timestamp', isEqualTo: document.timestamp)
+    //       .getDocuments()
+    //       .then(
+    //           (value) => value.documents[0].reference.updateData({'read': 0}));
+    // } catch (error) {
+    //   print(error.toString());
+    // }
     return Container(
       child: Column(
         children: <Widget>[
@@ -40,7 +54,8 @@ class YourMessage extends StatelessWidget {
                         children: <Widget>[
                           InkWell(
                             child: Text(
-                              document.content, ///////////////////////////////////////////////////////////////////////////
+                              document
+                                  .content, ///////////////////////////////////////////////////////////////////////////
                               style: TextStyle(
                                   color: hyperlink
                                       ? Colors.blue[900]
@@ -76,7 +91,8 @@ class YourMessage extends StatelessWidget {
                   Clipboard.setData(ClipboardData(
                     text: document.content,
                   ));
-                  Fluttertoast.showToast(msg: 'Message Copied');
+                  Fluttertoast.showToast(
+                      msg: 'Message Copied', backgroundColor: Colors.teal);
                 },
                 onTap: hyperlink
                     ? () async {

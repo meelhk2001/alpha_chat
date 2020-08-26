@@ -1,3 +1,5 @@
+import 'package:alphachat/providers/contactprovider.dart';
+
 import '../screens/chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -49,15 +51,42 @@ class HomeList extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => Chat(
-                                document.documentID,
-                                document['photoUrl'],
-                                contactDocument['nickname'],
-                                user.uid
-                              )));
+                              document.documentID,
+                              document['photoUrl'],
+                              contactDocument['nickname'],
+                              user.uid)));
                 },
                 onLongPress: () {
                   Provider.of<HomeProvider>(context, listen: false)
                       .copy(context, contactDocument.documentID.toString());
+                  var nickname = TextEditingController();
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Text('Enter nickname'),
+                            content: TextField(
+                              controller: nickname,
+                            ),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('cancel'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              FlatButton(
+                                onPressed: () async {
+                                  Provider.of<ContactProvider>(context,listen: false)
+                                      .addContact(
+                                          nickname.text,
+                                          contactDocument.documentID,
+                                          user.uid,
+                                          context);
+                                },
+                                child: Text('Okey'),
+                              ),
+                            ],
+                          ));
                 },
               ),
               if (readSnapshot.data.documents.length != 0)

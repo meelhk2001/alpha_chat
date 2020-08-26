@@ -18,72 +18,47 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //DBHelper.delete('messages');
-    return WillPopScope(
-      onWillPop: () {
-        Provider.of<HomeProvider>(context, listen: false).onExitPress(context);
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          leadingWidth: 68,
-          leading: Profile(user.uid),
-          centerTitle: true,
-          title: Text('Alphabics'),
-          actions: <Widget>[
-            IconButton(
-                icon: Icon(
-                  Icons.settings,
-                  size: 30,
+    return 
+      
+      Container(
+        child: StreamBuilder<dynamic>(
+          stream: Firestore.instance
+              .collection('users')
+              .document(user.uid)
+              .collection(
+                'contacts'
+              )
+               .orderBy('order', descending: true)
+              .snapshots(),
+          builder: (context, contactSnapshot) {
+            if (!contactSnapshot.hasData) {
+              
+              return Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
                 ),
-                onPressed: () {
-                  
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => EditYourself(user.uid)));
-                }),
-          ],
+              );
+            } else {
+              return ListView.builder(
+                //padding: EdgeInsets.all(10.0),
+                itemBuilder: (context, index) =>
+                    Provider.of<HomeProvider>(context).buildItem(context,
+                        contactSnapshot.data.documents[index], index, user),
+                itemCount: contactSnapshot.data.documents.length,
+              );
+            }
+          },
         ),
-        body: Container(
-          child: StreamBuilder<dynamic>(
-            stream: Firestore.instance
-                .collection('users')
-                .document(user.uid)
-                .collection(
-                  'contacts'
-                )
-                 .orderBy('order', descending: true)
-                .snapshots(),
-            builder: (context, contactSnapshot) {
-              if (!contactSnapshot.hasData) {
-                
-                return Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
-                  ),
-                );
-              } else {
-                return ListView.builder(
-                  //padding: EdgeInsets.all(10.0),
-                  itemBuilder: (context, index) =>
-                      Provider.of<HomeProvider>(context).buildItem(context,
-                          contactSnapshot.data.documents[index], index, user),
-                  itemCount: contactSnapshot.data.documents.length,
-                );
-              }
-            },
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddContacts(user),
-                  ));
-            },
-            child: Icon(Icons.add_call)),
-      ),
-    );
+      );
+      // floatingActionButton: FloatingActionButton(
+      //     onPressed: () {
+      //       Navigator.push(
+      //           context,
+      //           MaterialPageRoute(
+      //             builder: (context) => AddContacts(user),
+      //           ));
+      //     },
+      //     child: Icon(Icons.add_call)),
+    
   }
 }
