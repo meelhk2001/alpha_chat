@@ -209,13 +209,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.4.1"
-  flutter_downloader:
-    dependency: "direct main"
-    description:
-      name: flutter_downloader
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.5.0"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -223,13 +216,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.8.0"
-  flutter_parsed_text:
-    dependency: "direct main"
-    description:
-      name: flutter_parsed_text
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.2.4"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:

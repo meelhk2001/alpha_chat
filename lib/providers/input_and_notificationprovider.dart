@@ -134,7 +134,7 @@ class InputAndNotificationProvider with ChangeNotifier {
         ? await ImagePicker.pickVideo(source: ImageSource.gallery)
         : await ImagePicker.pickImage(source: ImageSource.gallery);
     File cropped, send;
-    var extDir = await Directory('/storage/emulated/0/Alphabics/media').create(recursive: true);
+    var extDir = await Directory('/storage/emulated/0/Alphabics').create(recursive: true);
     //await getExternalStorageDirectory();
     String ext = type == '1' ? '.jpg' : '.mp4';
     if (image != null && type[0] != '2') {
