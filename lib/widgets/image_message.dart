@@ -50,7 +50,7 @@ class _ImageMessageState extends State<ImageMessage> {
   Future<void> downloadFile() async {
     String ext = widget.document.type[0] == '1' ? '.jpg' : '.mp4';
     Dio dio = Dio();
-    dir = await Directory('/storage/emulated/0/Alphabics/media').create(recursive: true);
+    dir = await Directory('/storage/emulated/0/Alphabics').create(recursive: true);
     try {
       await dio.download(widget.document.content,
           "${dir.path}/${widget.document.timestamp}$ext",
@@ -151,7 +151,7 @@ class _ImageMessageState extends State<ImageMessage> {
           child: complete
               ? widget.document.type[0] == '2'
                   ? FutureBuilder<Directory>(
-                      future: Directory('/storage/emulated/0/Alphabics/media').create(recursive: true),
+                      future: Directory('/storage/emulated/0/Alphabics').create(recursive: true),
                       builder: (context, future) {
                         if (future.hasData) {
                           dir = future.data;
