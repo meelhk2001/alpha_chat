@@ -20,7 +20,8 @@ class UserDetails extends StatelessWidget {
                 return CustomScrollView(
                   slivers: [
                     SliverAppBar(
-                      expandedHeight: MediaQuery.of(context).size.height,
+                      elevation: 0,
+                      expandedHeight: MediaQuery.of(context).size.width-10,
                       pinned: true,
                       flexibleSpace: FlexibleSpaceBar(
                           centerTitle: true,
@@ -28,7 +29,10 @@ class UserDetails extends StatelessWidget {
                           background: snapshot.data['photoUrl'] == null
                               ? Image.asset('assets/profile.jpg')
                               : CachedNetworkImage(
-                                  imageUrl: snapshot.data['photoUrl'])
+                                fit: BoxFit.fill,
+                                  imageUrl: snapshot.data['photoUrl'],
+                                  
+                                  )
                           //Image.network(snapshot.data['photoUrl']) ,
                           ),
                     ),
@@ -40,7 +44,7 @@ class UserDetails extends StatelessWidget {
                       Text(
                         snapshot.data['aboutMe'],
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 30, color: Colors.teal),
+                        style: TextStyle(fontSize: 20, color: Colors.black),
                       ),
                       SizedBox(
                         height: 30,
@@ -56,7 +60,7 @@ class UserDetails extends StatelessWidget {
                       Text(
                         'Using Alphabics Since',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 30, color: Colors.teal),
+                        style: TextStyle(fontSize: 20, color: Colors.teal),
                       ),
                       SizedBox(
                         height: 10,
@@ -66,9 +70,9 @@ class UserDetails extends StatelessWidget {
                             DateTime.fromMillisecondsSinceEpoch(
                                 int.parse(snapshot.data['createdAt']))),
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 30, color: Colors.teal),
+                        style: TextStyle(fontSize: 20, color: Colors.black),
                       ),
-                      SizedBox(height: 10)
+                      SizedBox(height: 450)
                     ]))
                   ],
                 );

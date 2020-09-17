@@ -1,17 +1,10 @@
 import 'package:alphachat/helpers/db_helper.dart';
 import 'package:alphachat/helpers/message_modal.dart';
-import 'package:sqlbrite/sqlbrite.dart';
-import '../screens/chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../providers/authprovider.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import '../widgets/mymessage.dart';
 import '../widgets/yourmessage.dart';
-import 'package:path/path.dart' as path;
-import 'package:sqflite/sqflite.dart' as sql;
 
 class ChatProvider with ChangeNotifier {
   SharedPreferences prefs;
@@ -52,7 +45,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   Widget buildListMessage(
-      String groupChatId, listMessage, scaffoldKey, BuildContext context) {
+      String groupChatId, listMessage, scaffoldKey, BuildContext ctx) {
     // print('databaseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ');
     // print(sql.openReadOnlyDatabase(path.join(Provider.of<AuthProvider>(context, listen: false).dbPath, 'messages.db')).toString());
     return Flexible(
@@ -83,7 +76,8 @@ class ChatProvider with ChangeNotifier {
                         'idTo': listMessage['idTo'],
                         'timestamp': listMessage['timestamp'],
                         'content': listMessage['content'],
-                        'read': '0'
+                        'read': '0',
+                        'type': listMessage['type']
                       }).then((_) => Firestore.instance
                           .collection('messages')
                           .document(groupChatId)
@@ -94,7 +88,6 @@ class ChatProvider with ChangeNotifier {
                           .getDocuments()
                           .then((value) => value.documents[0].reference
                               .updateData({'read': 0})));
-                      
                     } else {
                       if (int.parse(messageSnapshot.data.documents[si]['read']
                               .toString()) ==
@@ -104,11 +97,11 @@ class ChatProvider with ChangeNotifier {
                         try {
                           DBHelper.update(groupChatId.replaceAll('-', '_'), {
                             'id': listMessage['timestamp'],
-                            'idFrom': listMessage['idFrom'],
-                            'idTo': listMessage['idTo'],
-                            'timestamp': listMessage['timestamp'],
-                            'content': listMessage['content'],
-                            'read': '0'
+                            // 'idFrom': listMessage['idFrom'],
+                            // 'idTo': listMessage['idTo'],
+                            // 'timestamp': listMessage['timestamp'],
+                            'read': '0',
+                            // 'type':listMessage['type']
                           }).then((_) => Firestore.instance
                               .collection('messages')
                               .document(groupChatId)
@@ -125,6 +118,7 @@ class ChatProvider with ChangeNotifier {
                     }
                   }
                 }
+
                 return StreamBuilder<List<Message>>(
                   stream:
                       DBHelper.getAllItems(groupChatId.replaceAll('-', '_')),
@@ -137,7 +131,8 @@ class ChatProvider with ChangeNotifier {
                                 AlwaysStoppedAnimation<Color>(Colors.teal)),
                       ));
                     } else {
-                      snapshot.data.sort((a,b)=>int.parse(a.timestamp).compareTo(int.parse(b.timestamp)));
+                      snapshot.data.sort((a, b) => int.parse(a.timestamp)
+                          .compareTo(int.parse(b.timestamp)));
                       // print(
                       //     'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ');
                       // print(snapshot.data.toString());
@@ -148,7 +143,8 @@ class ChatProvider with ChangeNotifier {
                             index,
                             snapshot.data[snapshot.data.length - index - 1],
                             snapshot.data,
-                            scaffoldKey,context),
+                            scaffoldKey,
+                            context),
                         itemCount: snapshot.data.length,
                         reverse: true,
                         //controller: listScrollController,
@@ -160,8 +156,8 @@ class ChatProvider with ChangeNotifier {
     );
   }
 
-  Widget buildChat(
-      int index, Message document, List<Message>listMessage, scaffoldKey, BuildContext context) {
+  Widget buildChat(int index, Message document, List<Message> listMessage,
+      scaffoldKey, BuildContext context) {
     bool hyperlink = false;
     if (!document.content.contains(" ")) {
       links.forEach((element) {
@@ -174,17 +170,17 @@ class ChatProvider with ChangeNotifier {
     if (document.idFrom == id) {
       // Right (my message)
       return MyMessage(
-                read: !(document.read=='1'),
-                hyperlink: hyperlink,
-                groupChatId: groupChatId,
-                document: document,
-                id: id,
-                index: listMessage.length-index-1,
-                listMessage: listMessage,
-                scaffoldKey: scaffoldKey,
-                cntx: context
-                //key: scaffoldKey,
-              );
+          read: !(document.read == '1'),
+          hyperlink: hyperlink,
+          groupChatId: groupChatId,
+          document: document,
+          id: id,
+          index: listMessage.length - index - 1,
+          listMessage: listMessage,
+          scaffoldKey: scaffoldKey,
+          cntx: context
+          //key: scaffoldKey,
+          );
       // return StreamBuilder<dynamic>(
       //     stream: Firestore.instance
       //         .collection('messages')
@@ -232,6 +228,7 @@ class ChatProvider with ChangeNotifier {
         hyperlink: hyperlink,
         document: document,
         groupChatId: groupChatId,
+        ctx: context,
       );
     }
   }

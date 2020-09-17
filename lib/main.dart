@@ -9,17 +9,22 @@ import './screens/login_screen.dart';
 import 'providers/authprovider.dart';
 import './providers/homeprovider.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider.value(value: AuthProvider()),
-      ChangeNotifierProvider.value(value: HomeProvider()),
-      ChangeNotifierProvider.value(value: ChatProvider()),
-      ChangeNotifierProvider.value(value: InputAndNotificationProvider()),
-      ChangeNotifierProvider.value(value: ContactProvider())
+      providers: [
+        ChangeNotifierProvider.value(value: AuthProvider()),
+        ChangeNotifierProvider.value(value: HomeProvider()),
+        ChangeNotifierProvider.value(value: ChatProvider()),
+        ChangeNotifierProvider.value(value: InputAndNotificationProvider()),
+        ChangeNotifierProvider.value(value: ContactProvider()),
+       // ChangeNotifierProvider.value(value: DownloadProvider())
       ],
       child: MaterialApp(
         title: 'Alphabics',

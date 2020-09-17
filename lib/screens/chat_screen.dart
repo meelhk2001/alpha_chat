@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:alphachat/helpers/db_helper.dart';
-import 'package:alphachat/providers/input_and_notificationprovider.dart';
 import 'package:alphachat/widgets/Profile.dart';
 
 import 'package:flutter/material.dart';
@@ -8,9 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:flutter/services.dart';
 import 'package:dio/dio.dart';
-import '../helpers/db_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../providers/chat_provider.dart';
@@ -48,6 +44,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    //print('ab to reload huaa bhai ye 8888888888888888884444444444444444444444444445555555555555555555555555555555555555555555555555555');
     //Firestore.instance.collection('links').document('links').
     _fcm.requestNotificationPermissions(
         IosNotificationSettings(sound: true, badge: true, alert: true));
@@ -72,7 +69,9 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
       },
       onLaunch: (Map<String, dynamic> message) async {
         print("onLaunch: $message");
-        // TODO optional
+        showDialog(context: context, builder: (context)=> AlertDialog(
+          title: message['notification'],
+        ));
       },
       onResume: (Map<String, dynamic> message) async {
         print("onResume: $message");
@@ -192,7 +191,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
     
     String body;
     var prefs = Provider.of<ChatProvider>(context, listen: false).prefs;
-    var _phone = await prefs.getString('phoneNumber');
+    var _phone =  prefs.getString('phoneNumber');
     var result = await Firestore.instance
         .collection('users')
         .document(widget.docId)

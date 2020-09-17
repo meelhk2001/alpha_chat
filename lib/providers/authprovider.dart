@@ -1,12 +1,12 @@
+import 'package:alphachat/screens/Permission_screen.dart';
 import 'package:alphachat/screens/tabs.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import '../screens/Home_Screen.dart';
-import 'package:sqflite/sqflite.dart' as sql;
 import 'package:provider/provider.dart';
 import 'contactprovider.dart';
 
@@ -24,23 +24,67 @@ class AuthProvider with ChangeNotifier {
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   FirebaseUser currentUser;
   FirebaseAuth _auth = FirebaseAuth.instance;
+  bool storage = false;
+  bool contact = false;
+  bool camera = false;
 
   //get current user function starts from here ................................
   Future<void> getCurrentUser(BuildContext context) async {
     try {
       // dbPath = await sql.getDatabasesPath();
-      Provider.of<ContactProvider>(context,listen: false).getContacts();
+
       isLoading = true;
       notifyListeners();
       user = await FirebaseAuth.instance.currentUser();
       if (user != null) {
         prefs = await SharedPreferences.getInstance();
         phoneNumber = prefs.getString('phonenumber');
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TabsScreen(user,phoneNumber),
-            ));
+        storage = await Permission.storage.isGranted;
+        contact = await Permission.contacts.isGranted;
+        camera = await Permission.camera.isGranted;
+        if (camera && contact && storage) {
+          Provider.of<ContactProvider>(context, listen: false).getContacts();
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TabsScreen(user, phoneNumber),
+              ));
+        } else {
+          if (!camera) {
+            await Permission.camera.request();
+            camera = await Permission.camera.isGranted;
+            
+          }
+          if (!contact) {
+              await Permission.contacts.request();
+              contact = await Permission.contacts.isGranted;
+              
+            }
+          if (!storage) {
+                await Permission.storage.request();
+                storage = await Permission.storage.isGranted;
+                
+              }
+              // camera = await Permission.camera.isGranted;
+              // storage = await Permission.storage.isGranted;
+          if (camera && contact && storage) {
+                  Provider.of<ContactProvider>(context, listen: false)
+                      .getContacts();
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TabsScreen(user, phoneNumber),
+                      ));
+                } else {
+                  print('camera, storage, contacts OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO PERMISSIONS OOO  ');
+                  print(camera.toString() + storage.toString() + contact.toString());
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PermissionScreen(),
+                      ));
+                }
+        }
       } else {
         isLoading = false;
         notifyListeners();
@@ -94,6 +138,7 @@ class AuthProvider with ChangeNotifier {
                                 onPressed: () async {
                                   loading = true;
                                   notifyListeners();
+                                  Navigator.of(context).pop();
                                   FirebaseAuth auth = FirebaseAuth.instance;
 
                                   credential = PhoneAuthProvider.getCredential(
@@ -133,7 +178,7 @@ class AuthProvider with ChangeNotifier {
             .collection('users')
             .document(firebaseUser.uid)
             .setData({
-          'nickname':phoneNumber,
+          'nickname': phoneNumber,
           'photoUrl': null,
           'id': firebaseUser.uid,
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
@@ -176,9 +221,8 @@ class AuthProvider with ChangeNotifier {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => Home(firebaseUser,phoneNumber),
-          )
-          );
+            builder: (context) => TabsScreen(firebaseUser, phoneNumber),
+          ));
     } else {
       Fluttertoast.showToast(msg: "Sign in fail");
 
@@ -187,10 +231,12 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  void loadingTrue(){
+
+  void loadingTrue() {
     loading = true;
     notifyListeners();
   }
+
   String get phone {
     return phoneNumber;
   }

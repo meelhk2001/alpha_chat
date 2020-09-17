@@ -1,12 +1,12 @@
+import 'package:alphachat/helpers/message_modal.dart';
 import 'package:alphachat/screens/chat_screen.dart';
-import 'package:alphachat/widgets/Profile.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ContactList extends StatefulWidget {
-  const ContactList({this.nickname, this.number, this.userUid});
-  final String nickname;
-  final String number;
+  const ContactList({this.contactUser, this.userUid});
+  final Message contactUser;
   final String userUid;
 
   @override
@@ -20,7 +20,7 @@ class _ContactListState extends State<ContactList> {
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      getDp(context);
+      //getDp(context);
       _isInit = false;
     }
 
@@ -30,25 +30,34 @@ class _ContactListState extends State<ContactList> {
   Future getDp(BuildContext context) async {
     var result = await Firestore.instance
         .collection('users')
-        .where('nickname', isEqualTo: widget.number.replaceFirst('+91', ''))
+        .where('nickname',
+            isEqualTo: widget.contactUser.id.replaceFirst('+91', ''))
         .getDocuments();
     document = result.documents[0];
     uid = result.documents[0].documentID;
-    setState(() {});
+    // setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading:Profile(uid),
-      title: Text(widget.nickname),
-      subtitle: Text(widget.number.replaceFirst('+91', '')),
+      tileColor: Colors.white,
+      leading: CircleAvatar(
+        backgroundImage: widget.contactUser.idFrom == null
+            ? AssetImage('assets/profile.jpg')
+            : CachedNetworkImageProvider(widget.contactUser.idFrom),
+      ),
+      title: Text(widget.contactUser.content),
+      subtitle: Text(widget.contactUser.id.replaceFirst('+91', '')),
       onTap: () {
-        getDp(context).then((value) => Navigator.push(
+        Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => Chat(document.documentID,
-                    document['photoUrl'], widget.nickname, widget.userUid))));
+                builder: (context) => Chat(
+                    widget.contactUser.idTo,
+                    widget.contactUser.idFrom,
+                    widget.contactUser.content,
+                    widget.userUid)));
       },
     );
   }

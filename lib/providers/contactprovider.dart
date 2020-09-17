@@ -1,3 +1,4 @@
+import 'package:alphachat/helpers/db_helper.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,6 +27,15 @@ class ContactProvider with ChangeNotifier {
       if (result.documents.length != 0 && !accountContacts.contains(contact)) {
         accountContacts.removeWhere(
             (element) => element.displayName == contact.displayName);
+            DBHelper.insert('contacts', {
+              'id': contact.phones.elementAt(i).value.replaceFirst('+91', ''),
+              'content':contact.displayName,
+                            'idFrom': result.documents[0]['photoUrl'],
+                            'idTo': result.documents[0].documentID,
+                            'timestamp': 'nothing',
+                            'read': '0',
+                            'type':'0'
+            });
         accountContacts.add(contact);
       }
     }

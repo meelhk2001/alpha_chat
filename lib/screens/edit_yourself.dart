@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:alphachat/helpers/db_helper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +77,10 @@ class _EditYourselfState extends State<EditYourself> {
         isLoading = true;
       });
     }
-    uploadFile();
+    await uploadFile();
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future uploadFile() async {
@@ -125,6 +127,7 @@ class _EditYourselfState extends State<EditYourself> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: Text('settings'),
         centerTitle: true,
         actions: <Widget>[
@@ -150,7 +153,7 @@ class _EditYourselfState extends State<EditYourself> {
                   children: <Widget>[
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.width * 0.9,
+                      height: MediaQuery.of(context).size.width ,
                       child: isLoading
                           ? Center(child: CircularProgressIndicator())
                           : CachedNetworkImage(imageUrl: realPhotoUrl,fit: BoxFit.cover,)
@@ -161,7 +164,7 @@ class _EditYourselfState extends State<EditYourself> {
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.width * 0.9,
+                      height: MediaQuery.of(context).size.width ,
                       child: Align(
                         alignment: Alignment.bottomRight,
                         child: Container(

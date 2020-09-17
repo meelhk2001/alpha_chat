@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'dart:io';
-import 'dart:convert';
 
 class Message {   
   final String id;
@@ -9,13 +6,15 @@ class Message {
   final String timestamp;
 final String   content;
 final String   read;
+final String type;
   const Message(
     this.id,
     this.content,
     this.idFrom,
     this.idTo,
     this.read,
-    this.timestamp
+    this.timestamp,
+    this.type
   );
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
@@ -24,7 +23,8 @@ final String   read;
       json['idFrom'],
       json['idTo'],
       json['read'],
-      json['timestamp']
+      json['timestamp'],
+      json['type']
     );
   }
 }

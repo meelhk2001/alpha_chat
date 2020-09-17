@@ -1,5 +1,8 @@
 import 'package:alphachat/helpers/message_modal.dart';
-import 'package:alphachat/screens/chat_screen.dart';
+import 'package:alphachat/screens/full_screen.dart';
+import 'package:alphachat/screens/photo_view.dart';
+import 'package:alphachat/widgets/videoMessage.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../helpers/db_helper.dart';
+import 'dart:io';
 
 class MyMessage extends StatelessWidget {
   MyMessage(
@@ -81,39 +85,64 @@ class MyMessage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    InkWell(
-                      child: Text(
-                        document.content,
-                        style: TextStyle(
-                            color: hyperlink ? Colors.blue[900] : Colors.white,
-                            fontSize: 18,
-                            decoration:
-                                hyperlink ? TextDecoration.underline : null,
-                            fontStyle: hyperlink ? FontStyle.italic : null),
-                      ),
-                      onTap: hyperlink
-                          ? () async {
-                              String text = document.content.toString();
+                    document.type[0] != '0'
+                        ? InkWell(
+                            child: Container(
+                              width: 250,
+                              height: 250,
+                              child: document.type[0] == '2'
+                                  ? VideoMessage(document.content)
+                                  : Image.file(
+                                      File(document.content),
+                                      fit: BoxFit.fill,
+                                    ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => document.type[0] == '2'
+                                          ? FullVideo(document.content)
+                                          : ImageView(document.content)));
+                            },
+                          )
+                        : InkWell(
+                            child: Text(
+                              document.content,
+                              style: TextStyle(
+                                  color: hyperlink
+                                      ? Colors.blue[900]
+                                      : Colors.white,
+                                  fontSize: 18,
+                                  decoration: hyperlink
+                                      ? TextDecoration.underline
+                                      : null,
+                                  fontStyle:
+                                      hyperlink ? FontStyle.italic : null),
+                            ),
+                            onTap: hyperlink
+                                ? () async {
+                                    String text = document.content.toString();
 
-                              //document['content'].toString().toLowerCase();
-                              text = text.replaceAll('https://', '');
-                              text = text.replaceAll('http://', "");
-                              text = text.replaceAll('https//', "");
-                              text = text.replaceAll('http//', "");
-                              //print('resume'.replaceAll('e', 'é'));
+                                    //document['content'].toString().toLowerCase();
+                                    text = text.replaceAll('https://', '');
+                                    text = text.replaceAll('http://', "");
+                                    text = text.replaceAll('https//', "");
+                                    text = text.replaceAll('http//', "");
+                                    //print('resume'.replaceAll('e', 'é'));
 
-                              var url =
-                                  'https://$text'; //document['content'].toString();
-                              //await launch(url);
+                                    var url =
+                                        'https://$text'; //document['content'].toString();
+                                    //await launch(url);
 
-                              if (await canLaunch(url)) {
-                                await launch(url);
-                              } else {
-                                throw 'Could not launch $url';
-                              }
-                            }
-                          : () {},
-                    ),
+                                    if (await canLaunch(url)) {
+                                      await launch(url);
+                                    } else {
+                                      throw 'Could not launch $url';
+                                    }
+                                  }
+                                : () {},
+                          ),
                     SizedBox(height: 5),
                     Text(
                       DateFormat('ddMMMyy h:mm a').format(
@@ -131,6 +160,16 @@ class MyMessage extends StatelessWidget {
                     //     document.read == '1' ? Colors.cyan[800] : Colors.teal,
                     borderRadius: BorderRadius.circular(8.0)),
               ),
+              onTap: document.type[0] == '1'
+                  ? () {
+                      // Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //           builder: (context) => ImageView(
+                      //             document.content
+                      //               )));
+                    }
+                  : null,
               onLongPress: () {
                 scaffoldKey.currentState.showBottomSheet((context) => Container(
                       child: Row(
@@ -159,13 +198,21 @@ class MyMessage extends StatelessWidget {
                                       .collection(groupChatId)
                                       .document(document.timestamp)
                                       .delete();
+                                  if (document.type[0] != '1') {
+                                    FirebaseStorage.instance
+                                        .ref()
+                                        .child(groupChatId)
+                                        .child(document.type)
+                                        .child(document.timestamp)
+                                        .delete();
+                                  }
                                 } catch (error) {
                                   print(error);
                                 }
                                 DBHelper.delete(
-                                        groupChatId.replaceAll('-', '_'),
-                                        document.id,cntx)
-                                    ;
+                                    groupChatId.replaceAll('-', '_'),
+                                    document.id,
+                                    cntx);
                               }),
                           IconButton(
                               icon: Icon(Icons.cancel),

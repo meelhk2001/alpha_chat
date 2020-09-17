@@ -1,7 +1,5 @@
 import 'package:alphachat/screens/Contacts.dart';
-
 import 'Home_Screen.dart';
-import 'add_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/Profile.dart';
