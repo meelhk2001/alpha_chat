@@ -175,7 +175,7 @@ class _ImageMessageState extends State<ImageMessage> {
                           opacity: 0.5,
                           child: widget.document.type[0] == '2'
                               ? Image.asset(
-                                  'assets/lvideo.png',
+                                  'assets/lvideo.gif',
                                   fit: BoxFit.fill,
                                 )
                               : Image.asset(
